@@ -1,4 +1,6 @@
 ---
+import { RepologyService, type Package } from '../services/repologyService';
+
 // List of projects to check
 const projects = [
     "pdi",
@@ -14,55 +16,19 @@ const projects = [
 // List of repositories we're interested in
 const targetRepos = ["pypi", "gnuguix", "spack", "nix_unstable"];
 
-// Function to fetch package data for a project
-async function fetchPackageData(project: string) {
-  const url = new URL(`https://repology.org/api/v1/project/${project}`);
+// Initialize the Repology service with caching and rate limiting
+const repologyService = new RepologyService();
 
-  try {
-    const response = await fetch(url, {
-      headers: {
-        "User-Agent": "numpex-stack/1.0",
-      }
-    });
+// Clean up expired cache entries on page load
+await repologyService.cleanupExpiredCache();
 
-    if (!response.ok) {
-      console.error(`Failed to fetch data for ${project}: ${response.status}`);
-      return [];
-    }
-
-    const data: Package[] = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`Error fetching data for ${project}:`, error);
-    return [];
-  }
-}
-
-// Interface for package data
-interface Package {
-  licenses: string[];
-  repo: string;
-  version: string;
-  visiblename: string;
-  summary: string;
-  status: string;
-}
-
-// Fetch data for all projects
-const projectData = await Promise.all(
-  projects.map(async (project) => {
-    const packages = await fetchPackageData(project);
-    return {
-      project,
-      packages
-    };
-  })
-);
+// Fetch data for all projects using the service
+const projectData = await repologyService.fetchMultipleProjects(projects);
 
 // Helper function to get version for a specific repo
-function getVersionForRepo(packages: Package[], repo: string): string | null {
+function getVersionForRepo(packages: Package[], repo: string): string | undefined {
   const repoPackage = packages.find(pkg => pkg.repo === repo);
-  return repoPackage ? repoPackage.version : null;
+  return repoPackage ? repoPackage.version : undefined;
 }
 
 // Helper function to get status color
@@ -76,16 +42,20 @@ function getStatusColor(status?: string): string {
 }
 
 // Helper function to get package status for a repo
-function getPackageStatus(packages: Package[], repo: string): string | null {
+function getPackageStatus(packages: Package[], repo: string): string | undefined {
   const repoPackage = packages.find(pkg => pkg.repo === repo);
-  return repoPackage ? repoPackage.status : null;
+  return repoPackage ? repoPackage.status : undefined;
 }
 ---
 
 <div class="container mx-auto p-6">
-  <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">
+  <h1 class="text-3xl font-bold text-gray-900 mb-4 text-center">
     Package Version Tracker
   </h1>
+  
+  <div class="text-center mb-6 text-sm text-gray-600">
+    Data is cached for 12 hours • Rate limited to 1 request/second
+  </div>
 
   <div class="bg-white rounded-lg shadow-lg overflow-hidden">
     <div class="overflow-x-auto">
@@ -103,14 +73,14 @@ function getPackageStatus(packages: Package[], repo: string): string | null {
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          {projectData.map(({ project, packages }) => (
+          {projectData.map(({ project, packages }: { project: string; packages: Package[] }) => (
             <tr class="hover:bg-gray-50 transition-colors">
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-medium text-gray-900">
                   {project}
                 </div>
                 <div class="text-sm text-gray-500">
-                  {packages.find(p => targetRepos.includes(p.repo))?.summary?.substring(0, 80) + '...' || 'Python package'}
+                  {packages.find((p: Package) => targetRepos.includes(p.repo))?.summary?.substring(0, 80) + '...' || 'Python package'}
                 </div>
               </td>
               {targetRepos.map(repo => {
