@@ -1,12 +1,18 @@
 ---
 // List of projects to check
 const projects = [
-  "python:transformers",
-  "python:accelerate"
+    "pdi",
+    "deisa",
+    "chameleon",
+    "python:dask",
+    "python:distributed",
+    "python:ray",
+    "python:transformers",
+    "python:accelerate"
 ];
 
 // List of repositories we're interested in
-const targetRepos = ["spack", "pypi"];
+const targetRepos = ["pypi", "gnuguix", "spack", "nix_unstable"];
 
 // Function to fetch package data for a project
 async function fetchPackageData(project: string) {
@@ -101,7 +107,7 @@ function getPackageStatus(packages: Package[], repo: string): string | null {
             <tr class="hover:bg-gray-50 transition-colors">
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-medium text-gray-900">
-                  {project.replace('python:', '')}
+                  {project}
                 </div>
                 <div class="text-sm text-gray-500">
                   {packages.find(p => targetRepos.includes(p.repo))?.summary?.substring(0, 80) + '...' || 'Python package'}
