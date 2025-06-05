@@ -24,6 +24,8 @@ export function urlFor(repo: TargetRepo, srcname: string): URL | undefined {
   } else if (repo === "nix_unstable") {
     return new URL(`https://search.nixos.org/packages?channel=unstable&show=${srcname}`);
   }
+  
+  return undefined;
 }
 
 class RepologyService {
