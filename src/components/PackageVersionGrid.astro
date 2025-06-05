@@ -3,14 +3,32 @@ import { RepologyService, type Package } from '../services/repologyService';
 
 // List of projects to check
 const projects = [
+    // Numpex stack
     "pdi",
     "deisa",
     "chameleon",
+    "starpu",
+    // Distributed stack
     "python:dask",
     "python:distributed",
     "python:ray",
+    // Torch stack
+    "python:torch",
+    "python:torchaudio",
+    "python:torchvision",
+    "python:pytorch-lightning",
+    // Huggingface stack
     "python:transformers",
-    "python:accelerate"
+    "python:accelerate",
+    // Jax stack
+    "python:jax",
+    "python:jaxtyping",
+    "python:jaxlib",
+    "python:flax",
+    "python:optax",
+    "python:chex",
+    "python:orbax",
+    "python:equinox",
 ];
 
 // List of repositories we're interested in
@@ -52,7 +70,7 @@ function getPackageStatus(packages: Package[], repo: string): string | undefined
   <h1 class="text-3xl font-bold text-gray-900 mb-4 text-center">
     Package Version Tracker
   </h1>
-  
+
   <div class="text-center mb-6 text-sm text-gray-600">
     Data is cached for 12 hours • Rate limited to 1 request/second
   </div>
