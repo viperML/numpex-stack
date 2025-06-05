@@ -83,32 +83,34 @@ function getPackageStatus(packages: Package[], repo: string): string | undefined
     Data is cached for 12 hours • Rate limited to 1 request/second
   </div>
 
-  <div class="space-y-8">
-    {Object.entries(projectCategories).map(([categoryName, categoryProjects]) => (
-      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div class="bg-gray-100 px-6 py-4 border-b border-gray-200">
-          <h2 class="text-xl font-semibold text-gray-800">{categoryName}</h2>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Package
-                </th>
-                {targetRepos.map(repo => (
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {repo}
-                  </th>
-                ))}
+  <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Package
+            </th>
+            {targetRepos.map(repo => (
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {repo}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody class="bg-white">
+          {Object.entries(projectCategories).map(([categoryName, categoryProjects], categoryIndex) => (
+            <>
+              <tr class="bg-gray-100">
+                <td class="px-6 py-4 text-lg font-semibold text-gray-800" colspan={targetRepos.length + 1}>
+                  {categoryName}
+                </td>
               </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              {categoryProjects.map(project => {
+              {categoryProjects.map((project, projectIndex) => {
                 const projectInfo = projectData.find(p => p.project === project);
                 const packages = projectInfo ? projectInfo.packages : [];
                 return (
-                  <tr class="hover:bg-gray-50 transition-colors">
+                  <tr class="hover:bg-gray-50 transition-colors border-t border-gray-200">
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="text-sm font-medium text-gray-900">
                         {project}
@@ -142,11 +144,18 @@ function getPackageStatus(packages: Package[], repo: string): string | undefined
                   </tr>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    ))}
+              {categoryIndex < Object.entries(projectCategories).length - 1 && (
+                <tr>
+                  <td class="px-6 py-2" colspan={targetRepos.length + 1}>
+                    <div class="border-b border-gray-300"></div>
+                  </td>
+                </tr>
+              )}
+            </>
+          ))}
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="mt-8 text-center">
