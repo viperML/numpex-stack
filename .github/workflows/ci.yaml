@@ -34,4 +34,4 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: viperml/numpex-stack:latest
+          tags: ghcr.io/viperml/numpex-stack:latest, ghcr.io/viperml/numpex-stack:${{ github.sha }}
