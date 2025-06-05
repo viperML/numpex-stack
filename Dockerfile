@@ -19,10 +19,10 @@ COPY . .
 # Build the Astro application
 RUN pnpm run build
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 EXPOSE 8080
-ENV PORT 8080
-ENV HOST 0.0.0.0
+ENV PORT=8080
+ENV HOST=0.0.0.0
 
 # Start the server using the standalone entry point
 CMD ["node", "dist/server/entry.mjs"]

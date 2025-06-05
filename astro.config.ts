@@ -5,7 +5,7 @@ import node from "@astrojs/node";
 
 export default defineConfig({
   base: "/numpex-stack/",
-  trailingSlash: "ignore",
+  trailingSlash: "always",
   output: "server",
 
   server: {
