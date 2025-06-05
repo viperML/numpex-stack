@@ -1,0 +1,32 @@
+---
+const url = new URL("https://repology.org/api/v1/project/nh");
+
+const r = await fetch(url, {
+    headers: {
+        "User-Agent": "numpex-stack/1.0",
+    }
+});
+
+console.log(r);
+
+const resp: Package[] = await r.json();
+
+interface Package {
+    licenses: string[],
+    repo: string,
+    version: string,
+    visiblename: string,
+    summary: string,
+    status: string,
+}
+---
+
+<div>
+    {resp.map(p => {
+        return <>
+            <h1>{p.visiblename}</h1>
+            <h2>{p.repo}</h2>
+            <h2>{p.version}</h2>
+        </>
+    })}
+</div>
