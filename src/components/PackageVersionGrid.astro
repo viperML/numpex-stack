@@ -1,35 +1,43 @@
 ---
 import { RepologyService, type Package } from '../services/repologyService';
 
-// List of projects to check
-const projects = [
-    // Numpex stack
-    "pdi",
-    "deisa",
-    "chameleon",
-    "starpu",
-    // Distributed stack
-    "python:dask",
-    "python:distributed",
-    "python:ray",
-    // Torch stack
-    "python:torch",
-    "python:torchaudio",
-    "python:torchvision",
-    "python:pytorch-lightning",
-    // Huggingface stack
-    "python:transformers",
-    "python:accelerate",
-    // Jax stack
-    "python:jax",
-    "python:jaxtyping",
-    "python:jaxlib",
-    "python:flax",
-    "python:optax",
-    "python:chex",
-    "python:orbax",
-    "python:equinox",
-];
+// List of projects organized by categories
+const projectCategories = {
+    "Numpex Stack": [
+        "pdi",
+        "deisa",
+        "chameleon",
+        "starpu",
+    ],
+    "Distributed Computing": [
+        "python:dask",
+        "python:distributed",
+        "python:ray",
+    ],
+    "PyTorch Ecosystem": [
+        "python:torch",
+        "python:torchaudio",
+        "python:torchvision",
+        "python:pytorch-lightning",
+    ],
+    "Hugging Face": [
+        "python:transformers",
+        "python:accelerate",
+    ],
+    "JAX Ecosystem": [
+        "python:jax",
+        "python:jaxtyping",
+        "python:jaxlib",
+        "python:flax",
+        "python:optax",
+        "python:chex",
+        "python:orbax",
+        "python:equinox",
+    ],
+};
+
+// Flatten all projects for the API call
+const projects = Object.values(projectCategories).flat();
 
 // List of repositories we're interested in
 const targetRepos = ["pypi", "gnuguix", "spack", "nix_unstable"];
@@ -75,59 +83,70 @@ function getPackageStatus(packages: Package[], repo: string): string | undefined
     Data is cached for 12 hours • Rate limited to 1 request/second
   </div>
 
-  <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Package
-            </th>
-            {targetRepos.map(repo => (
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {repo}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          {projectData.map(({ project, packages }: { project: string; packages: Package[] }) => (
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-gray-900">
-                  {project}
-                </div>
-                <div class="text-sm text-gray-500">
-                  {packages.find((p: Package) => targetRepos.includes(p.repo))?.summary?.substring(0, 80) + '...' || 'Python package'}
-                </div>
-              </td>
-              {targetRepos.map(repo => {
-                const version = getVersionForRepo(packages, repo);
-                const status = getPackageStatus(packages, repo);
+  <div class="space-y-8">
+    {Object.entries(projectCategories).map(([categoryName, categoryProjects]) => (
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="bg-gray-100 px-6 py-4 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-800">{categoryName}</h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Package
+                </th>
+                {targetRepos.map(repo => (
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {repo}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {categoryProjects.map(project => {
+                const projectInfo = projectData.find(p => p.project === project);
+                const packages = projectInfo ? projectInfo.packages : [];
                 return (
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    {version ? (
-                      <div class="flex flex-col">
-                        <span class="text-sm font-semibold text-gray-900">
-                          {version}
-                        </span>
-                        <span class={`text-xs font-medium ${getStatusColor(status)}`}>
-                          {status}
-                        </span>
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900">
+                        {project}
                       </div>
-                    ) : (
-                      <span class="text-sm text-gray-400 italic">
-                        Not available
-                      </span>
-                    )}
-                  </td>
+                      <div class="text-sm text-gray-500">
+                        {packages.find((p: Package) => targetRepos.includes(p.repo))?.summary?.substring(0, 80) + '...' || 'Python package'}
+                      </div>
+                    </td>
+                    {targetRepos.map(repo => {
+                      const version = getVersionForRepo(packages, repo);
+                      const status = getPackageStatus(packages, repo);
+                      return (
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          {version ? (
+                            <div class="flex flex-col">
+                              <span class="text-sm font-semibold text-gray-900">
+                                {version}
+                              </span>
+                              <span class={`text-xs font-medium ${getStatusColor(status)}`}>
+                                {status}
+                              </span>
+                            </div>
+                          ) : (
+                            <span class="text-sm text-gray-400 italic">
+                              Not available
+                            </span>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
                 );
               })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    ))}
   </div>
 
   <div class="mt-8 text-center">
