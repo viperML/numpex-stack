@@ -1,14 +1,14 @@
 import type { APIRoute } from 'astro';
 import { RepologyService } from '../../services/repologyService';
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async () => {
   try {
     const repologyService = new RepologyService();
     await repologyService.clearCache();
-    
-    return new Response(JSON.stringify({ 
-      success: true, 
-      message: 'Cache cleared successfully' 
+
+    return new Response(JSON.stringify({
+      success: true,
+      message: 'Cache cleared successfully'
     }), {
       status: 200,
       headers: {
@@ -16,8 +16,8 @@ export const POST: APIRoute = async ({ request }) => {
       }
     });
   } catch (error) {
-    return new Response(JSON.stringify({ 
-      success: false, 
+    return new Response(JSON.stringify({
+      success: false,
       message: 'Failed to clear cache',
       error: error instanceof Error ? error.message : 'Unknown error'
     }), {
