@@ -1,7 +1,16 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro"
 import PackageVersionGrid from "../components/PackageVersionGrid.astro"
+import LoadingSpinner from "../components/LoadingSpinner.astro"
 ---
 <MainLayout>
-  <PackageVersionGrid server:defer/>
+  <PackageVersionGrid server:defer>
+    <LoadingSpinner 
+      slot="fallback"
+      title="Loading Package Data"
+      description="Fetching the latest package version information from multiple repositories. This may take a few moments..."
+      showProgress={true}
+      size="md"
+    />
+  </PackageVersionGrid>
 </MainLayout>
