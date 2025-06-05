@@ -35,3 +35,11 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ghcr.io/viperml/numpex-stack:latest, ghcr.io/viperml/numpex-stack:${{ github.sha }}
+
+      - name: Request deployment to Nomad
+        env:
+          NOMAD_ADDR: https://nomad.ayats.org
+          NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN }}
+          NOMAD_HTTP_AUTH: ${{ secrets.NOMAD_HTTP_AUTH }}
+        run: |
+          nomad run -var="tag=ghcr.io/viperml/numpex-stack:${{ github.sha }}" ./app.nomad
