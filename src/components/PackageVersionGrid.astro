@@ -106,7 +106,7 @@ function getPackageStatus(packages: Package[], repo: string): string | undefined
                   {categoryName}
                 </td>
               </tr>
-              {categoryProjects.map((project, projectIndex) => {
+              {categoryProjects.map((project) => {
                 const projectInfo = projectData.find(p => p.project === project);
                 const packages = projectInfo ? projectInfo.packages : [];
                 return (
