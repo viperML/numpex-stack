@@ -8,6 +8,22 @@ interface Package {
   visiblename: string;
   summary: string;
   status: string;
+  srcname: string, // Name given by the repo
+}
+
+const targetRepos = ["pypi", "spack", "gnuguix", "nix_unstable", ]
+type TargetRepo = typeof targetRepos[number];
+
+export function urlFor(repo: TargetRepo, srcname: string): URL | undefined {
+  if (repo === "pypi") {
+    return new URL(`https://pypi.org/project/${srcname}/`);
+  } else if (repo === "spack") {
+    return new URL(`https://packages.spack.io/package.html?name=${srcname}`);
+  } else if (repo === "gnuguix") {
+    return new URL(`https://hpc.guix.info/package/${srcname}`);
+  } else if (repo === "nix_unstable") {
+    return new URL(`https://search.nixos.org/packages?channel=unstable&show=${srcname}`);
+  }
 }
 
 class RepologyService {
@@ -26,7 +42,7 @@ class RepologyService {
 
   async fetchPackageData(project: string): Promise<Package[]> {
     const cacheKey = this.getCacheKey(project);
-    
+
     // Try to get from cache first
     const cachedData = await this.cache.get(cacheKey);
     if (cachedData) {
@@ -35,7 +51,7 @@ class RepologyService {
     }
 
     console.log(`Cache miss for project: ${project}, fetching from API...`);
-    
+
     // Apply rate limiting before making the request
     await this.rateLimiter.waitIfNeeded();
 
@@ -54,10 +70,10 @@ class RepologyService {
       }
 
       const data: Package[] = await response.json();
-      
+
       // Cache the successful response
       await this.cache.set(cacheKey, data, this.CACHE_TTL);
-      
+
       return data;
     } catch (error) {
       console.error(`Error fetching data for ${project}:`, error);
@@ -67,9 +83,9 @@ class RepologyService {
 
   async fetchMultipleProjects(projects: string[]): Promise<Array<{ project: string; packages: Package[] }>> {
     console.log(`Fetching data for ${projects.length} projects...`);
-    
+
     const results = [];
-    
+
     // Process projects sequentially to respect rate limiting
     for (const project of projects) {
       const packages = await this.fetchPackageData(project);
@@ -78,7 +94,7 @@ class RepologyService {
         packages
       });
     }
-    
+
     console.log('Finished fetching all project data');
     return results;
   }

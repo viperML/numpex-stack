@@ -1,5 +1,5 @@
 ---
-import { RepologyService, type Package } from '../services/repologyService';
+import { RepologyService, type Package, urlFor } from '../services/repologyService';
 
 // List of projects organized by categories
 const projectCategories = {
@@ -72,6 +72,12 @@ function getPackageStatus(packages: Package[], repo: string): string | undefined
   const repoPackage = packages.find(pkg => pkg.repo === repo);
   return repoPackage ? repoPackage.status : undefined;
 }
+
+// Helper function to get srcname for a specific repo
+function getSrcnameForRepo(packages: Package[], repo: string): string | undefined {
+  const repoPackage = packages.find(pkg => pkg.repo === repo);
+  return repoPackage ? repoPackage.srcname : undefined;
+}
 ---
 
 <div class="container mx-auto p-6">
@@ -122,13 +128,26 @@ function getPackageStatus(packages: Package[], repo: string): string | undefined
                     {targetRepos.map(repo => {
                       const version = getVersionForRepo(packages, repo);
                       const status = getPackageStatus(packages, repo);
+                      const srcname = getSrcnameForRepo(packages, repo);
+                      const repoUrl = srcname ? urlFor(repo, srcname) : null;
                       return (
                         <td class="px-6 py-4 whitespace-nowrap">
                           {version ? (
                             <div class="flex flex-col">
-                              <span class="text-sm font-semibold text-gray-900">
-                                {version}
-                              </span>
+                              {repoUrl ? (
+                                <a
+                                  href={repoUrl.toString()}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  class="text-sm font-semibold text-gray-900 underline decoration-dotted hover:decoration-solid hover:bg-gray-100 transition-all duration-150"
+                                >
+                                  {version}
+                                </a>
+                              ) : (
+                                <span class="text-sm font-semibold text-gray-900">
+                                  {version}
+                                </span>
+                              )}
                               <span class={`text-xs font-medium ${getStatusColor(status)}`}>
                                 {status}
                               </span>
