@@ -36,6 +36,9 @@ jobs:
           push: true
           tags: ghcr.io/viperml/numpex-stack:latest, ghcr.io/viperml/numpex-stack:${{ github.sha }}
 
+      - name: Install Nomad
+        uses: hashicorp/setup-nomad@main
+
       - name: Request deployment to Nomad
         env:
           NOMAD_ADDR: https://nomad.ayats.org
