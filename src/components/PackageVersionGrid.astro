@@ -3,12 +3,25 @@ import { RepologyService, type Package, urlFor } from '../services/repologyServi
 
 // List of projects organized by categories
 const projectCategories = {
-    "Numpex Stack": [
-        "pdi",
-        "deisa",
-        "chameleon",
-        "starpu",
-    ],
+  "General Purpose": [
+    "cmake",
+    "openmpi",
+    "python:numpy",
+    "python:scipy",
+    "python:pillow",
+    "python:pandas",
+    "python:scikit-learn",
+    "hdf5",
+    "libyaml",
+    "netcdf",
+  ],
+  "Numpex Stack": [
+      "pdi",
+      "deisa",
+      "chameleon",
+      "starpu",
+      "parflow",
+  ],
     "Distributed Computing": [
         "python:dask",
         "python:distributed",
@@ -16,13 +29,10 @@ const projectCategories = {
     ],
     "PyTorch Ecosystem": [
         "python:torch",
+        "python:torchsde",
         "python:torchaudio",
         "python:torchvision",
         "python:pytorch-lightning",
-    ],
-    "Hugging Face": [
-        "python:transformers",
-        "python:accelerate",
     ],
     "JAX Ecosystem": [
         "python:jax",
@@ -33,6 +43,14 @@ const projectCategories = {
         "python:chex",
         "python:orbax",
         "python:equinox",
+    ],
+    "AI Ecosystem": [
+        "python:transformers",
+        "python:accelerate",
+        "python:safetensors",
+        "python:tokenizers",
+        "python:datasets",
+        "python:gradio",
     ],
 };
 
