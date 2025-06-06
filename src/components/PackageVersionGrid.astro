@@ -129,6 +129,24 @@ function getSrcnameForRepo(packages: Package[], repo: string): string | undefine
   const repoPackage = getHighestVersionPackage(packages, repo);
   return repoPackage ? repoPackage.srcname : undefined;
 }
+
+// Helper function to get the longest description from all packages
+function getLongestDescription(packages: Package[]): string {
+  const relevantPackages = packages.filter((p: Package) =>
+    targetRepos.includes(p.repo) && p.status !== "rolling" && p.summary
+  );
+
+  if (relevantPackages.length === 0) {
+    return 'Package description not available.';
+  }
+
+  const description = relevantPackages.reduce((longest, current) => {
+    return (current.summary?.length || 0) > (longest.summary?.length || 0) ? current : longest;
+  }).summary || 'Package description not available.';
+
+  // Ensure the description ends with a dot
+  return description.endsWith('.') ? description : description + '.';
+}
 ---
 
 <div class="container mx-auto p-6">
@@ -168,12 +186,12 @@ function getSrcnameForRepo(packages: Package[], repo: string): string | undefine
                 const packages = projectInfo ? projectInfo.packages : [];
                 return (
                   <tr class="hover:bg-gray-50 transition-colors border-t border-gray-200">
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-6 py-4">
                       <div class="text-sm font-medium text-gray-900">
                         {project}
                       </div>
-                      <div class="text-sm text-gray-500">
-                        {packages.find((p: Package) => targetRepos.includes(p.repo) && p.status !== "rolling")?.summary?.substring(0, 80) + '...' || 'Python package'}
+                      <div class="text-sm text-gray-500 package-description max-w-sm" title={getLongestDescription(packages)}>
+                        {getLongestDescription(packages)}
                       </div>
                     </td>
                     {targetRepos.map(repo => {
@@ -253,3 +271,23 @@ function getSrcnameForRepo(packages: Package[], repo: string): string | undefine
     Data provided by <a href="https://repology.org" class="text-blue-600 hover:text-blue-800 underline">Repology</a>
   </div>
 </div>
+
+<style>
+  /* Custom styles for better description display */
+  .package-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+    max-height: 2.8em;
+  }
+
+  /* Alternative single-line ellipsis for smaller screens */
+  @media (max-width: 768px) {
+    .package-description {
+      -webkit-line-clamp: 1;
+      max-height: 1.4em;
+    }
+  }
+</style>
