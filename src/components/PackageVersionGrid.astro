@@ -161,18 +161,6 @@ function getLongestDescription(packages: Package[]): string {
   <div class="bg-white rounded-lg shadow-lg overflow-hidden">
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Package
-            </th>
-            {targetRepos.map(repo => (
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {repo}
-              </th>
-            ))}
-          </tr>
-        </thead>
         <tbody class="bg-white">
           {Object.entries(projectCategories).map(([categoryName, categoryProjects], categoryIndex) => (
             <>
@@ -180,6 +168,16 @@ function getLongestDescription(packages: Package[]): string {
                 <td class="px-6 py-4 text-lg font-semibold text-gray-800" colspan={targetRepos.length + 1}>
                   {categoryName}
                 </td>
+              </tr>
+              <tr class="bg-gray-50">
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Package
+                </th>
+                {targetRepos.map(repo => (
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {repo}
+                  </th>
+                ))}
               </tr>
               {categoryProjects.map((project) => {
                 const projectInfo = projectData.find(p => p.project === project);
