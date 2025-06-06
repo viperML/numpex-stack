@@ -69,9 +69,42 @@ await repologyService.cleanupExpiredCache();
 // Fetch data for all projects using the service
 const projectData = await repologyService.fetchMultipleProjects(projects);
 
+// Helper function to compare versions (basic semantic version comparison)
+function compareVersions(a: string, b: string): number {
+  const aParts = a.split('.').map(part => parseInt(part.replace(/[^\d]/g, '')) || 0);
+  const bParts = b.split('.').map(part => parseInt(part.replace(/[^\d]/g, '')) || 0);
+  
+  const maxLength = Math.max(aParts.length, bParts.length);
+  
+  for (let i = 0; i < maxLength; i++) {
+    const aPart = aParts[i] || 0;
+    const bPart = bParts[i] || 0;
+    
+    if (aPart > bPart) return 1;
+    if (aPart < bPart) return -1;
+  }
+  
+  return 0;
+}
+
+// Helper function to get the package with highest version for a specific repo
+function getHighestVersionPackage(packages: Package[], repo: string): Package | undefined {
+  const repoPackages = packages.filter(pkg => pkg.repo === repo && pkg.status !== "rolling");
+  
+  if (repoPackages.length === 0) return undefined;
+  if (repoPackages.length === 1) return repoPackages[0];
+  
+  return repoPackages.reduce((highest, current) => {
+    if (compareVersions(current.version, highest.version) > 0) {
+      return current;
+    }
+    return highest;
+  });
+}
+
 // Helper function to get version for a specific repo
 function getVersionForRepo(packages: Package[], repo: string): string | undefined {
-  const repoPackage = packages.find(pkg => pkg.repo === repo && pkg.status !== "rolling");
+  const repoPackage = getHighestVersionPackage(packages, repo);
   return repoPackage ? repoPackage.version : undefined;
 }
 
@@ -87,13 +120,13 @@ function getStatusColor(status?: string): string {
 
 // Helper function to get package status for a repo
 function getPackageStatus(packages: Package[], repo: string): string | undefined {
-  const repoPackage = packages.find(pkg => pkg.repo === repo && pkg.status !== "rolling");
+  const repoPackage = getHighestVersionPackage(packages, repo);
   return repoPackage ? repoPackage.status : undefined;
 }
 
 // Helper function to get srcname for a specific repo
 function getSrcnameForRepo(packages: Package[], repo: string): string | undefined {
-  const repoPackage = packages.find(pkg => pkg.repo === repo && pkg.status !== "rolling");
+  const repoPackage = getHighestVersionPackage(packages, repo);
   return repoPackage ? repoPackage.srcname : undefined;
 }
 ---
