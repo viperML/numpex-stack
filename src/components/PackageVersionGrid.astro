@@ -58,7 +58,7 @@ const projectCategories = {
 const projects = Object.values(projectCategories).flat();
 
 // List of repositories we're interested in
-const targetRepos = ["pypi", "gnuguix", "spack", "nix_unstable"];
+const targetRepos = ["spack", "gnuguix", "nix_unstable", "pypi"];
 
 // Initialize the Repology service with caching and rate limiting
 const repologyService = new RepologyService();
@@ -71,7 +71,7 @@ const projectData = await repologyService.fetchMultipleProjects(projects);
 
 // Helper function to get version for a specific repo
 function getVersionForRepo(packages: Package[], repo: string): string | undefined {
-  const repoPackage = packages.find(pkg => pkg.repo === repo);
+  const repoPackage = packages.find(pkg => pkg.repo === repo && pkg.status !== "rolling");
   return repoPackage ? repoPackage.version : undefined;
 }
 
@@ -87,13 +87,13 @@ function getStatusColor(status?: string): string {
 
 // Helper function to get package status for a repo
 function getPackageStatus(packages: Package[], repo: string): string | undefined {
-  const repoPackage = packages.find(pkg => pkg.repo === repo);
+  const repoPackage = packages.find(pkg => pkg.repo === repo && pkg.status !== "rolling");
   return repoPackage ? repoPackage.status : undefined;
 }
 
 // Helper function to get srcname for a specific repo
 function getSrcnameForRepo(packages: Package[], repo: string): string | undefined {
-  const repoPackage = packages.find(pkg => pkg.repo === repo);
+  const repoPackage = packages.find(pkg => pkg.repo === repo && pkg.status !== "rolling");
   return repoPackage ? repoPackage.srcname : undefined;
 }
 ---
@@ -140,7 +140,7 @@ function getSrcnameForRepo(packages: Package[], repo: string): string | undefine
                         {project}
                       </div>
                       <div class="text-sm text-gray-500">
-                        {packages.find((p: Package) => targetRepos.includes(p.repo))?.summary?.substring(0, 80) + '...' || 'Python package'}
+                        {packages.find((p: Package) => targetRepos.includes(p.repo) && p.status !== "rolling")?.summary?.substring(0, 80) + '...' || 'Python package'}
                       </div>
                     </td>
                     {targetRepos.map(repo => {
