@@ -9,6 +9,10 @@ permissions:
   contents: read
   packages: write
 
+concurrency:
+  group: ci
+  cancel-in-progress: true
+
 jobs:
   buildx:
     runs-on: ubuntu-latest
