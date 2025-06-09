@@ -3,7 +3,7 @@ variable "tag" {
   default = "ghcr.io/viperml/numpex-stack"
 }
 
-job "user-count" {
+job "numpex-stack" {
   datacenters = ["dc1"]
 
   group "group" {
