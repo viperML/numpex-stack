@@ -35,12 +35,12 @@ job "numpex-stack" {
           location = "/numpex-stack"
         }
 
-        # check {
-        #   type     = "http"
-        #   interval = "30s"
-        #   timeout  = "1s"
-        #   path = "/next-test"
-        # }
+        check {
+          type     = "http"
+          interval = "120s"
+          timeout  = "5s"
+          path = "/numpex-stack"
+        }
       }
     }
   }
