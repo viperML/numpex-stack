@@ -34,13 +34,6 @@ job "numpex-stack" {
         meta {
           location = "/numpex-stack"
         }
-
-        check {
-          type     = "http"
-          interval = "120s"
-          timeout  = "5s"
-          path = "/numpex-stack"
-        }
       }
     }
   }
